@@ -13,7 +13,13 @@ public class NewsService {
     @Autowired
     private NewsRepository newsRepository;
 
+    // Получить все новости
     public List<News> getAllNews(){
         return newsRepository.findAll();
+    }
+
+    // Создать новость
+    public News createNews(News news) {
+        return newsRepository.save(news);
     }
 }
