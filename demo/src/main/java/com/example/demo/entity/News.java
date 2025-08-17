@@ -9,7 +9,8 @@ import java.time.LocalDate;
 public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long Id;
+    private Long id;
+
     private String title;
     private String content;
     private String img;
@@ -18,21 +19,14 @@ public class News {
     public News() {
     }
 
-    public News(Long id, String title, String content, String img, LocalDate date) {
-        Id = id;
+    public News(String title, String content, String img, LocalDate date) {
         this.title = title;
         this.content = content;
         this.img = img;
         this.date = date;
     }
 
-    public Long getId() {
-        return Id;
-    }
-
-    public void setId(Long id) {
-        Id = id;
-    }
+    public Long getId() { return id; }
 
     public String getTitle() {
         return title;

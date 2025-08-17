@@ -16,12 +16,12 @@ public class NewsController {
     @Autowired
     private NewsService newsService;
 
-    @GetMapping("/v1/getAllNews")
+    @GetMapping("/v1/News")
     public List<News> getAllNews(){
         return newsService.getAllNews();
     }
 
-    @PostMapping("/v1/createNews")
+    @PostMapping("/v1/News")
     public News createNews(@RequestBody News news){
          return newsService.createNews(news);
     }
