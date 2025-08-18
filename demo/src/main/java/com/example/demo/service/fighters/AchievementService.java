@@ -17,4 +17,8 @@ public class AchievementService {
         return achievementRepository.findAll();
     }
 
+    public Achievement createAchievementRepository(Achievement achievement){
+        return achievementRepository.save(achievement);
+    }
+
 }
