@@ -19,9 +19,9 @@ public class Achievement {
     public Achievement() {
     }
 
-    public Achievement(String title, Fighters fighters) {
+    public Achievement(String title, Fighters fighter) {
         this.title = title;
-        this.fighter = fighters;
+        this.fighter = fighter;
     }
 
     public Long getId() {
@@ -36,11 +36,11 @@ public class Achievement {
         this.title = title;
     }
 
-    public Fighters getFighters() {
+    public Fighters getFighter() {
         return fighter;
     }
 
-    public void setFighters(Fighters fighters) {
-        this.fighter = fighters;
+    public void setFighter(Fighters fighter) {
+        this.fighter = fighter;
     }
 }

@@ -3,25 +3,24 @@ package com.example.demo.controller.fighters;
 import com.example.demo.entity.fighters.Achievement;
 import com.example.demo.service.fighters.AchievementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/achievements")
 public class AchievementController {
-    @Autowired
-    private AchievementService achievementService;
 
-    @GetMapping("/v1/fighters/status")
-    public List<Achievement> getAllAchievements(){
-        return achievementService.getAllAchievements();
+    private final AchievementService achievementService;
+
+    public AchievementController(AchievementService achievementService) {
+        this.achievementService = achievementService;
     }
 
-    @PostMapping("/v1/fighters/status")
-    public Achievement createAchievementRepository(@RequestBody Achievement achievement){
-        return achievementService.createAchievementRepository(achievement);
+    @PostMapping
+    public Achievement createAchievement(@RequestParam Long fighterId,
+                                         @RequestParam String title) {
+        return achievementService.createAchievement(fighterId, title);
     }
 }
+

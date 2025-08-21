@@ -1,17 +1,9 @@
-package com.example.demo.entity.fighters;
-
-import jakarta.persistence.*;
+package com.example.demo.dto;
 
 import java.util.List;
 
-@Entity
-@Table(name = "fighters")
-
-public class Fighters {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class FighterDTO {
     private Long id;
-
     private String name;
     private String nickname;
     private String birthplace;
@@ -26,35 +18,14 @@ public class Fighters {
     private String rank;
     private String instagram;
     private String img;
-
-    @OneToMany(mappedBy = "fighter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Achievement> achievements;
-
-    public Fighters() {
-    }
-
-    public Fighters(String name, String nickname, String birthplace, String weightClass, String record, String tko,
-                    String solution, String submissive, String other, String country, String sport, String rank, String instagram,
-                    String img, List<Achievement> achievements) {
-        this.name = name;
-        this.nickname = nickname;
-        this.birthplace = birthplace;
-        this.weightClass = weightClass;
-        this.record = record;
-        this.tko = tko;
-        this.solution = solution;
-        this.submissive = submissive;
-        this.other = other;
-        this.country = country;
-        this.sport = sport;
-        this.rank = rank;
-        this.instagram = instagram;
-        this.img = img;
-        this.achievements = achievements;
-    }
+    private List<AchievementDTO> achievements;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -169,11 +140,11 @@ public class Fighters {
         this.img = img;
     }
 
-    public List<Achievement> getAchievements() {
+    public List<AchievementDTO> getAchievements() {
         return achievements;
     }
 
-    public void setAchievements(List<Achievement> achievements) {
+    public void setAchievements(List<AchievementDTO> achievements) {
         this.achievements = achievements;
     }
 }
