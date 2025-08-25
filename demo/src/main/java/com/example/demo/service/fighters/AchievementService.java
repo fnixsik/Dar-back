@@ -1,13 +1,10 @@
 package com.example.demo.service.fighters;
 
-import com.example.demo.entity.fighters.Achievement;
-import com.example.demo.entity.fighters.Fighters;
+import com.example.demo.entity.fighter.Achievement;
+import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AchievementService {

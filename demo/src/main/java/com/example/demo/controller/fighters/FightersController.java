@@ -1,16 +1,15 @@
 package com.example.demo.controller.fighters;
 
-import com.example.demo.dto.AchievementDTO;
-import com.example.demo.dto.FighterDTO;
-import com.example.demo.entity.fighters.Fighters;
+import com.example.demo.dto.fighter.AchievementDTO;
+import com.example.demo.dto.fighter.FighterDTO;
+import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.service.fighters.FightersService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/fighters")
+@RequestMapping("/v1/fighters")
 public class FightersController {
     private final FightersService fighterService;
 
@@ -34,5 +33,10 @@ public class FightersController {
     @GetMapping("/{id}")
     public FighterDTO getFighter(@PathVariable Long id) {
         return fighterService.getFighter(id);
+    }
+
+    @GetMapping()
+    public  List<FighterDTO> getAllFighters(){
+        return fighterService.getAllFighters();
     }
 }

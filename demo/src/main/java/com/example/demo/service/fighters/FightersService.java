@@ -1,12 +1,11 @@
 package com.example.demo.service.fighters;
 
-import com.example.demo.dto.AchievementDTO;
-import com.example.demo.dto.FighterDTO;
-import com.example.demo.entity.fighters.Achievement;
-import com.example.demo.entity.fighters.Fighters;
+import com.example.demo.dto.fighter.AchievementDTO;
+import com.example.demo.dto.fighter.FighterDTO;
+import com.example.demo.entity.fighter.Achievement;
+import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +46,13 @@ public class FightersService {
         return mapToDTO(fighter);
     }
 
+    public List<FighterDTO> getAllFighters() {
+        List<Fighters> list = fighterRepository.findAll();
+        return list.stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
     // ==========================
     // 🔹 Маппинг Entity → DTO
     // ==========================
@@ -56,7 +62,18 @@ public class FightersService {
         dto.setId(fighter.getId());
         dto.setName(fighter.getName());
         dto.setNickname(fighter.getNickname());
+        dto.setBirthplace(fighter.getBirthplace());
+        dto.setWeightClass(fighter.getWeightClass());
+        dto.setRecord(fighter.getRecord());
+        dto.setTko(fighter.getTko());
+        dto.setSolution(fighter.getSolution());
+        dto.setSubmissive(fighter.getSubmissive());
+        dto.setOther(fighter.getOther());
         dto.setCountry(fighter.getCountry());
+        dto.setSport(fighter.getSport());
+        dto.setRank(fighter.getRank());
+        dto.setInstagram(fighter.getInstagram());
+        dto.setImg(fighter.getImg());
 
         List<AchievementDTO> achievements = fighter.getAchievements().stream()
                 .map(this::mapAchievementToDTO)

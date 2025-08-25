@@ -1,4 +1,4 @@
-package com.example.demo.entity.fighters;
+package com.example.demo.entity.fighter;
 
 import jakarta.persistence.*;
 

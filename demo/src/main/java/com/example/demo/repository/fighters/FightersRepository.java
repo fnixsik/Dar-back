@@ -1,7 +1,7 @@
 package com.example.demo.repository.fighters;
 
 
-import com.example.demo.entity.fighters.Fighters;
+import com.example.demo.entity.fighter.Fighters;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,11 +1,8 @@
 package com.example.demo.controller.fighters;
 
-import com.example.demo.entity.fighters.Achievement;
+import com.example.demo.entity.fighter.Achievement;
 import com.example.demo.service.fighters.AchievementService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/achievements")
