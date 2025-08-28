@@ -2,6 +2,7 @@ package com.example.demo.entity.coach;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,8 +16,8 @@ public class Coache {
     private String status;
     private String img;
 
-    @OneToMany(mappedBy = "coache", cascade = CascadeType.ALL)
-    private List<Merit> merit;
+    @OneToMany(mappedBy = "coache", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Merit> merit = new ArrayList<>();
 
     public Coache() {
     }

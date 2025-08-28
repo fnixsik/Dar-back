@@ -2,6 +2,7 @@ package com.example.demo.entity.fighter;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Fighters {
     private String img;
 
     @OneToMany(mappedBy = "fighter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Achievement> achievements;
+    private List<Achievement> achievements = new ArrayList<>();
 
     public Fighters() {
     }

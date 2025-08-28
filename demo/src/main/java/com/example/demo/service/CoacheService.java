@@ -9,6 +9,7 @@ import com.example.demo.repository.coache.MeritRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CoacheService {
@@ -25,9 +26,33 @@ public class CoacheService {
         Coache saved = coacheRepository.save(coache);
         return mapToDTO(saved);
     }
-}
 
+    // добавить достижение к Тренер
+    public MeritDTO addMerit(Long coacheId, String list){
+        Coache coache = coacheRepository.findById(coacheId)
+                .orElseThrow(() -> new RuntimeException("coache not found"));
 
+        Merit merit = new Merit();
+        merit.setList(list);
+        merit.setCoache(coache);
+
+        Merit saved = meritRepository.save(merit);
+        return mapMeritDTO(saved);
+    }
+
+    // получить Тренер с достижениями
+    public CoacheDTO getCoache(Long id){
+        Coache coache = coacheRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("coache not found"));
+        return mapToDTO(coache);
+    }
+
+    public List<CoacheDTO> getAllCoaches(){
+        List<Coache> list = coacheRepository.findAll();
+        return list.stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
 
     // ==========================
     // 🔹 Маппинг Entity → DTO
@@ -49,9 +74,10 @@ public class CoacheService {
     }
 
     private MeritDTO  mapMeritDTO(Merit merit){
-    MeritDTO dto = new MeritDTO();
-    dto.setId(merit.getId());
-    dto.setList(merit.getList());
-    return dto;
+        MeritDTO dto = new MeritDTO();
+        dto.setId(merit.getId());
+        dto.setList(merit.getList());
+        return dto;
     }
+}
 
