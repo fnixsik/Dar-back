@@ -20,7 +20,7 @@ public class ScheduleCoachController {
         return scheduleCoachService.getAll();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{day}")
     public ScheduleCoachDTO update(@PathVariable String day, @RequestBody ScheduleCoachDTO request) {
         return scheduleCoachService.update(day, request);
     }
