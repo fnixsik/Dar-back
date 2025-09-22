@@ -1,65 +1,67 @@
 package com.example.demo.security;
 
 import io.jsonwebtoken.*;
-import org.springframework.stereotype.Service;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "my-first-secret-key-for-dar";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
-
     private final Key key;
+    private final long expirationMs;
 
-    public JwtService(){
-        this.key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    public JwtService(@Value("${jwt.secret}") String base64Secret,
+                      @Value("${jwt.expiration-ms}") long expirationMs) {
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret));
+        this.expirationMs = expirationMs;
     }
 
-    // Генерация токена
-    public String generateToken(String username, Set<String> roles){
+    public String generateToken(UserDetails user, Set<String> roles) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", roles);
+        Date now = new Date();
         return Jwts.builder()
-                .setSubject(username)
-                .claim("roles", roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Извлечение username
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    // Извлечение ролей
     @SuppressWarnings("unchecked")
     public Set<String> extractRoles(String token) {
-        return new HashSet<>(
-                (List<String>) extractAllClaims(token).get("roles")
-        );
+        Object val = extractAllClaims(token).get("roles");
+        if (val instanceof List<?> list) {
+            Set<String> set = new HashSet<>();
+            for (Object o : list) if (o != null) set.add(o.toString());
+            return set;
+        }
+        return Collections.emptySet();
     }
 
-    // Проверка валидности
-    public boolean isTokenValid(String token, String username) {
-        return extractUsername(token).equals(username) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractAllClaims(token).getExpiration().before(new Date());
+    public boolean isTokenValid(String token, String expectedUsername) {
+        Claims claims = extractAllClaims(token);
+        return expectedUsername.equals(claims.getSubject()) && claims.getExpiration().after(new Date());
     }
 
     private Claims extractAllClaims(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            return Jwts.parserBuilder().setSigningKey(key).build()
+                    .parseClaimsJws(token).getBody();
         } catch (JwtException e) {
             throw new IllegalArgumentException("Invalid JWT", e);
         }
     }
+
+    public long getExpirationMs() { return expirationMs; }
 }
