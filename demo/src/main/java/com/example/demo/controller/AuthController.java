@@ -40,9 +40,13 @@ public class AuthController {
         if (userRepository.existsByUsername(req.getUsername())) {
             return ResponseEntity.badRequest().body(Map.of("error","Username already taken"));
         }
+        if (userRepository.existsByEmail(req.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("error","Email already used"));
+        }
         User user = new User();
         user.setUsername(req.getUsername());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
