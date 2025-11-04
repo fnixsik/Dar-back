@@ -5,7 +5,7 @@ import com.example.demo.service.fighters.AchievementService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/achievements")
+@RequestMapping("/admin/v1/achievements")
 public class AchievementController {
 
     private final AchievementService achievementService;

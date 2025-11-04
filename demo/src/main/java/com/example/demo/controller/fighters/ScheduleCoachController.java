@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/schedule")
+@RequestMapping("/admin/v1/schedule")
 public class ScheduleCoachController {
     private final ScheduleCoachService scheduleCoachService;
 
