@@ -14,7 +14,7 @@ public class NewsController {
     @Autowired
     private NewsService newsService;
 
-    @GetMapping("/v1/News")
+    @GetMapping
     public List<News> getAllNews(){
         return newsService.getAllNews();
     }
