@@ -46,6 +46,15 @@ public class FightersService {
         return mapToDTO(fighter);
     }
 
+    public FighterDTO deleteFighter(Long id) {
+        Fighters fighter =  fighterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fighter not found"));
+
+        fighterRepository.delete(fighter);
+
+        return  mapToDTO(fighter);
+    }
+
     public List<FighterDTO> getAllFighters() {
         List<Fighters> list = fighterRepository.findAll();
         return list.stream()

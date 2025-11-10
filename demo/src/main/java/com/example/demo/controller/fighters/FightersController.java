@@ -23,6 +23,11 @@ public class FightersController {
         return fighterService.createFighter(fighter);
     }
 
+    @DeleteMapping("/{id}")
+    public  FighterDTO deleteFighter(@RequestBody Fighters fighter) {
+        return fighterService.deleteFighter(fighter.getId());
+    }
+
     // POST /fighters/{id}/achievements -> добавить достижение
     @PostMapping("/{id}/achievements")
     public AchievementDTO addAchievement(@PathVariable Long id, @RequestBody AchievementDTO request) {
