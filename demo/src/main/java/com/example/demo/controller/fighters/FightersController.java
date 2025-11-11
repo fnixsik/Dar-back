@@ -24,8 +24,13 @@ public class FightersController {
     }
 
     @DeleteMapping("/{id}")
-    public  FighterDTO deleteFighter(@RequestBody Fighters fighter) {
-        return fighterService.deleteFighter(fighter.getId());
+    public  FighterDTO deleteFighter(@PathVariable Long id) {
+        return fighterService.deleteFighter(id);
+    }
+
+    @PutMapping("/{id}")
+    public FighterDTO updateFighter(@PathVariable Long id, @RequestBody Fighters fighter) {
+        return fighterService.updateFighter(id, fighter);
     }
 
     // POST /fighters/{id}/achievements -> добавить достижение

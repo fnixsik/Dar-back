@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.coache.CoacheDTO;
 import com.example.demo.service.NewsService;
 import com.example.demo.entity.News;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class NewsController {
         return newsService.getAllNews();
     }
 
-    @PostMapping("/v1/News")
+    @PostMapping
     public News createNews(@RequestBody News news){
          return newsService.createNews(news);
     }

@@ -4,11 +4,15 @@ import com.example.demo.dto.coache.CoacheDTO;
 import com.example.demo.dto.coache.MeritDTO;
 import com.example.demo.entity.coach.Coache;
 import com.example.demo.entity.coach.Merit;
+import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.coache.CoacheRepository;
 import com.example.demo.repository.coache.MeritRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +27,24 @@ public class CoacheService {
 
     // Создать Тренера
     public CoacheDTO createCoache(Coache coache) {
+        Coache saved = coacheRepository.save(coache);
+        return mapToDTO(saved);
+    }
+
+    public CoacheDTO deleteCoache( Long id) {
+        Coache coache = coacheRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coache not found"));
+        coacheRepository.delete(coache);
+        return mapToDTO(coache);
+    }
+
+    public CoacheDTO updateCoache(Long id, Coache updatedData) {
+        Coache coache = coacheRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Coache not found with id: " + id));
+
+        // ИСКЛЮЧАЕМ ПРАВИЛЬНЫЕ ПОЛЯ
+        BeanUtils.copyProperties(updatedData, coache, "id", "merit");
+
         Coache saved = coacheRepository.save(coache);
         return mapToDTO(saved);
     }

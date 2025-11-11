@@ -6,9 +6,11 @@ import com.example.demo.entity.fighter.Achievement;
 import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class FightersService {
@@ -44,6 +46,17 @@ public class FightersService {
         Fighters fighter = fighterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Fighter not found"));
         return mapToDTO(fighter);
+    }
+
+    public FighterDTO updateFighter(Long id, Fighters updatedData) {
+        Fighters fighter = fighterRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Fighter not found with id: " + id));
+
+        // копируем все совпадающие поля, кроме тех, что не надо трогать
+        BeanUtils.copyProperties(updatedData, fighter, "id", "achievements");
+
+        Fighters saved = fighterRepository.save(fighter);
+        return mapToDTO(saved);
     }
 
     public FighterDTO deleteFighter(Long id) {

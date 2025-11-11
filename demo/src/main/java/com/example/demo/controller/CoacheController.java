@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.coache.CoacheDTO;
 import com.example.demo.dto.coache.MeritDTO;
+import com.example.demo.dto.fighter.FighterDTO;
 import com.example.demo.entity.coach.Coache;
+import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.service.CoacheService;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,16 @@ public class CoacheController {
     @PostMapping("/{id}/merit")
     public MeritDTO addMerit(@PathVariable Long id, @RequestBody MeritDTO request) {
         return  coacheService.addMerit(id, request.getList());
+    }
+
+    @DeleteMapping("/{id}")
+    public CoacheDTO deleteCoache(@PathVariable Long id) {
+        return coacheService.deleteCoache(id);
+    }
+
+    @PutMapping("/{id}")
+    public CoacheDTO updateCoache(@PathVariable Long id, @RequestBody Coache coache) {
+        return coacheService.updateCoache(id, coache);
     }
 
     // GET /coache/{id} -> получить Тренерa с ачивками
