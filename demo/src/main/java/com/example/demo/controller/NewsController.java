@@ -37,4 +37,9 @@ public class NewsController {
     public NewsDTO updateNews(@PathVariable Long id, @RequestBody News news) {
         return newsService.updateNews(id, news);
     }
+
+    @GetMapping("/{id}")
+    public NewsDTO getnews(@PathVariable Long id) {
+        return newsService.getnews(id);
+    }
 }

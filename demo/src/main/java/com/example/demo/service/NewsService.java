@@ -48,6 +48,12 @@ public class NewsService {
         return  mapToDTO(news);
     }
 
+    public NewsDTO getnews(Long id) {
+        News news = newsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+        return mapToDTO(news);
+    }
+
     private NewsDTO mapToDTO(News news) {
         NewsDTO dto = new NewsDTO();
         BeanUtils.copyProperties(news, dto);

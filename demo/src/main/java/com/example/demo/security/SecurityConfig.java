@@ -64,10 +64,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/v1/fighters").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/v1/schedules").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/v1/coaches").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/v1/news").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER","ADMIN")
                         .anyRequest().authenticated()
