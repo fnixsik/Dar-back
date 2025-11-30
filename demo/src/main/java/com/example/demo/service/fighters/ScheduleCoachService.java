@@ -12,6 +12,16 @@ import java.util.stream.Collectors;
 public class ScheduleCoachService {
     private final ScheduleCoachRepository scheduleCoachRepository;
 
+    private static final List<String> DAY_ORDER = List.of(
+            "Понедельник",
+            "Вторник",
+            "Среда",
+            "Четверг",
+            "Пятница",
+            "Суббота",
+            "Воскресенье"
+    );
+
     public ScheduleCoachService (ScheduleCoachRepository scheduleCoachRepository) {
         this.scheduleCoachRepository = scheduleCoachRepository;
     }
@@ -19,6 +29,9 @@ public class ScheduleCoachService {
     public List<ScheduleCoachDTO> getAll(){
         return scheduleCoachRepository.findAll()
                 .stream()
+                .sorted((a, b) ->
+                        DAY_ORDER.indexOf(a.getDay()) - DAY_ORDER.indexOf(b.getDay())
+                )
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
