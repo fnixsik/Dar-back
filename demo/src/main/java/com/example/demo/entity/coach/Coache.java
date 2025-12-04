@@ -27,7 +27,17 @@ public class Coache {
         this.name = name;
         this.status = status;
         this.img = img;
-        this.merit = merit;
+        setMerit(merit);
+    }
+
+    public void setMerit(List<Merit> merits) {
+        this.merit.clear();
+        if (merits != null) {
+            for (Merit m : merits) {
+                m.setCoache(this);
+                this.merit.add(m);
+            }
+        }
     }
 
     public Long getId() {
@@ -64,9 +74,5 @@ public class Coache {
 
     public List<Merit> getMerit() {
         return merit;
-    }
-
-    public void setMerit(List<Merit> merit) {
-        this.merit = merit;
     }
 }

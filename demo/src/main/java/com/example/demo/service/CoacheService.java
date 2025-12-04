@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class CoacheService {
+
     private final CoacheRepository coacheRepository;
     private final MeritRepository meritRepository;
 
@@ -25,81 +26,112 @@ public class CoacheService {
         this.meritRepository = meritRepository;
     }
 
-    // Создать Тренера
     public CoacheDTO createCoache(Coache coache) {
+
+        if (coache.getMerit() != null) {
+            for (Merit m : coache.getMerit()) {
+                m.setCoache(coache);
+            }
+        }
+
         Coache saved = coacheRepository.save(coache);
         return mapToDTO(saved);
     }
 
-    public CoacheDTO deleteCoache( Long id) {
-        Coache coache = coacheRepository.findById(id)
+    public CoacheDTO updateCoache(Long id, Coache updated) {
+        Coache existing = coacheRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Coache not found"));
-        coacheRepository.delete(coache);
-        return mapToDTO(coache);
-    }
 
-    public CoacheDTO updateCoache(Long id, Coache updatedData) {
-        Coache coache = coacheRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Coache not found with id: " + id));
+        existing.setName(updated.getName());
+        existing.setStatus(updated.getStatus());
+        existing.setImg(updated.getImg());
 
-        // ИСКЛЮЧАЕМ ПРАВИЛЬНЫЕ ПОЛЯ
-        BeanUtils.copyProperties(updatedData, coache, "id", "merit");
+        existing.getMerit().clear();
 
-        Coache saved = coacheRepository.save(coache);
+        if (updated.getMerit() != null) {
+            for (Merit m : updated.getMerit()) {
+                m.setCoache(existing);
+                existing.getMerit().add(m);
+            }
+        }
+
+        Coache saved = coacheRepository.save(existing);
         return mapToDTO(saved);
     }
 
-    // добавить достижение к Тренер
-    public MeritDTO addMerit(Long coacheId, String list){
+    public CoacheDTO deleteCoache(Long id) {
+        Coache c = coacheRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coache not found"));
+        coacheRepository.delete(c);
+        return mapToDTO(c);
+    }
+
+    public MeritDTO addMerit(Long coacheId, String list) {
         Coache coache = coacheRepository.findById(coacheId)
-                .orElseThrow(() -> new RuntimeException("coache not found"));
+                .orElseThrow(() -> new RuntimeException("Coache not found"));
 
-        Merit merit = new Merit();
-        merit.setList(list);
-        merit.setCoache(coache);
+        Merit m = new Merit();
+        m.setList(list);
+        m.setCoache(coache);
+        coache.getMerit().add(m);
 
-        Merit saved = meritRepository.save(merit);
-        return mapMeritDTO(saved);
+        coacheRepository.save(coache);
+
+        return mapMeritDTO(m);
     }
 
-    // получить Тренер с достижениями
-    public CoacheDTO getCoache(Long id){
-        Coache coache = coacheRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("coache not found"));
-        return mapToDTO(coache);
+    public CoacheDTO getCoache(Long id) {
+        return mapToDTO(
+                coacheRepository.findById(id).orElseThrow()
+        );
     }
 
-    public List<CoacheDTO> getAllCoaches(){
-        List<Coache> list = coacheRepository.findAll();
-        return list.stream()
+    public List<CoacheDTO> getAllCoaches() {
+        return coacheRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .toList();
     }
 
-    // ==========================
-    // 🔹 Маппинг Entity → DTO
-    // ==========================
+    public CoacheDTO deleteMerit(Long coachId, Long meritId) {
+        Coache coach = coacheRepository.findById(coachId)
+                .orElseThrow(() -> new RuntimeException("Coach not found"));
 
-    private CoacheDTO mapToDTO(Coache coache){
+        Merit merit = meritRepository.findById(meritId)
+                .orElseThrow(() -> new RuntimeException("Merit not found"));
+
+        if (!merit.getCoache().getId().equals(coachId)) {
+            throw new RuntimeException("This merit does not belong to this coach");
+        }
+
+        coach.getMerit().remove(merit); // orphanRemoval = true → JPA удалит merit из БД
+
+        Coache saved = coacheRepository.save(coach);
+
+        return mapToDTO(saved);
+    }
+
+    private CoacheDTO mapToDTO(Coache c) {
         CoacheDTO dto = new CoacheDTO();
-        dto.setId(coache.getId());
-        dto.setName(coache.getName());
-        dto.setStatus(coache.getStatus());
-        dto.setImg(coache.getImg());
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        dto.setStatus(c.getStatus());
+        dto.setImg(c.getImg());
 
-        List<MeritDTO> merit = coache.getMerit().stream()
-                .map(this::mapMeritDTO)
-                .toList();
+        dto.setMerit(
+                c.getMerit().stream()
+                        .map(this::mapMeritDTO)
+                        .toList()
+        );
 
-        dto.setMerit(merit);
         return dto;
     }
 
-    private MeritDTO  mapMeritDTO(Merit merit){
+    private MeritDTO mapMeritDTO(Merit m) {
         MeritDTO dto = new MeritDTO();
-        dto.setId(merit.getId());
-        dto.setList(merit.getList());
+        dto.setId(m.getId());
+        dto.setList(m.getList());
         return dto;
     }
 }
+
 

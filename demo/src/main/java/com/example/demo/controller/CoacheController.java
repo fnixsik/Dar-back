@@ -41,6 +41,14 @@ public class CoacheController {
         return coacheService.updateCoache(id, coache);
     }
 
+    @DeleteMapping("/{coachId}/merit/{meritId}")
+    public CoacheDTO deleteMerit(
+            @PathVariable Long coachId,
+            @PathVariable Long meritId
+    ) {
+        return coacheService.deleteMerit(coachId, meritId);
+    }
+
     // GET /coache/{id} -> получить Тренерa с ачивками
     @GetMapping("/{id}")
     public CoacheDTO getCoache(@PathVariable Long id){
