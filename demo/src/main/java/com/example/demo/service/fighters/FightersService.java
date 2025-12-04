@@ -6,7 +6,6 @@ import com.example.demo.entity.fighter.Achievement;
 import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,73 +13,124 @@ import java.util.NoSuchElementException;
 
 @Service
 public class FightersService {
+
     private final FightersRepository fighterRepository;
     private final AchievementRepository achievementRepository;
 
-    public FightersService(FightersRepository fighterRepository, AchievementRepository achievementRepository) {
+    public FightersService(FightersRepository fighterRepository,
+                           AchievementRepository achievementRepository) {
         this.fighterRepository = fighterRepository;
         this.achievementRepository = achievementRepository;
     }
 
-    // создать бойца
+    // CREATE
     public FighterDTO createFighter(Fighters fighter) {
+
+        if (fighter.getAchievements() != null) {
+            for (Achievement a : fighter.getAchievements()) {
+                a.setFighter(fighter);
+            }
+        }
+
         Fighters saved = fighterRepository.save(fighter);
         return mapToDTO(saved);
     }
 
-    // добавить достижение к бойцу
+    // UPDATE
+    public FighterDTO updateFighter(Long id, Fighters updated) {
+        Fighters existing = fighterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fighter not found"));
+
+        existing.setName(updated.getName());
+        existing.setNickname(updated.getNickname());
+        existing.setBirthplace(updated.getBirthplace());
+        existing.setWeightClass(updated.getWeightClass());
+        existing.setRecord(updated.getRecord());
+        existing.setTko(updated.getTko());
+        existing.setSolution(updated.getSolution());
+        existing.setSubmissive(updated.getSubmissive());
+        existing.setOther(updated.getOther());
+        existing.setCountry(updated.getCountry());
+        existing.setSport(updated.getSport());
+        existing.setRank(updated.getRank());
+        existing.setInstagram(updated.getInstagram());
+        existing.setImg(updated.getImg());
+
+        existing.getAchievements().clear();
+
+        if (updated.getAchievements() != null) {
+            for (Achievement a : updated.getAchievements()) {
+                a.setFighter(existing);
+                existing.getAchievements().add(a);
+            }
+        }
+
+        Fighters saved = fighterRepository.save(existing);
+        return mapToDTO(saved);
+    }
+
+    // DELETE
+    public FighterDTO deleteFighter(Long id) {
+        Fighters fighter = fighterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fighter not found"));
+
+        fighterRepository.delete(fighter);
+        return mapToDTO(fighter);
+    }
+
+    public AchievementDTO deleteAchievement(Long fighterId, Long achievementId) {
+
+        Fighters fighter = fighterRepository.findById(fighterId)
+                .orElseThrow(() -> new RuntimeException("Fighter not found"));
+
+        Achievement achievement = fighter.getAchievements().stream()
+                .filter(a -> a.getId().equals(achievementId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Achievement not found"));
+
+        fighter.getAchievements().remove(achievement);
+
+        fighterRepository.save(fighter);
+
+        return mapAchievementToDTO(achievement);
+    }
+
+
+    // ADD ACHIEVEMENT
     public AchievementDTO addAchievement(Long fighterId, String title) {
         Fighters fighter = fighterRepository.findById(fighterId)
                 .orElseThrow(() -> new RuntimeException("Fighter not found"));
 
-        Achievement achievement = new Achievement();
-        achievement.setTitle(title);
-        achievement.setFighter(fighter);
+        Achievement a = new Achievement();
+        a.setTitle(title);
+        a.setFighter(fighter);
 
-        Achievement saved = achievementRepository.save(achievement);
-        return mapAchievementToDTO(saved);
+        fighter.getAchievements().add(a);
+
+        fighterRepository.save(fighter);
+
+        return mapAchievementToDTO(a);
     }
 
-    // получить бойца с достижениями
+    // GET
     public FighterDTO getFighter(Long id) {
         Fighters fighter = fighterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Fighter not found"));
         return mapToDTO(fighter);
     }
 
-    public FighterDTO updateFighter(Long id, Fighters updatedData) {
-        Fighters fighter = fighterRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Fighter not found with id: " + id));
-
-        // копируем все совпадающие поля, кроме тех, что не надо трогать
-        BeanUtils.copyProperties(updatedData, fighter, "id", "achievements");
-
-        Fighters saved = fighterRepository.save(fighter);
-        return mapToDTO(saved);
-    }
-
-    public FighterDTO deleteFighter(Long id) {
-        Fighters fighter =  fighterRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Fighter not found"));
-
-        fighterRepository.delete(fighter);
-
-        return  mapToDTO(fighter);
-    }
-
     public List<FighterDTO> getAllFighters() {
-        List<Fighters> list = fighterRepository.findAll();
-        return list.stream()
+        return fighterRepository.findAll()
+                .stream()
                 .map(this::mapToDTO)
                 .toList();
     }
 
-    // ==========================
-    // 🔹 Маппинг Entity → DTO
-    // ==========================
+    // ----- MAPPERS -----
 
     private FighterDTO mapToDTO(Fighters fighter) {
         FighterDTO dto = new FighterDTO();
+
         dto.setId(fighter.getId());
         dto.setName(fighter.getName());
         dto.setNickname(fighter.getNickname());
@@ -97,11 +147,12 @@ public class FightersService {
         dto.setInstagram(fighter.getInstagram());
         dto.setImg(fighter.getImg());
 
-        List<AchievementDTO> achievements = fighter.getAchievements().stream()
-                .map(this::mapAchievementToDTO)
-                .toList();
+        dto.setAchievements(
+                fighter.getAchievements().stream()
+                        .map(this::mapAchievementToDTO)
+                        .toList()
+        );
 
-        dto.setAchievements(achievements);
         return dto;
     }
 
@@ -112,4 +163,3 @@ public class FightersService {
         return dto;
     }
 }
-

@@ -11,21 +11,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/v1/fighters")
 public class FightersController {
+
     private final FightersService fighterService;
 
     public FightersController(FightersService fighterService) {
         this.fighterService = fighterService;
     }
 
-    // POST /fighters -> создать бойца
     @PostMapping
     public FighterDTO createFighter(@RequestBody Fighters fighter) {
         return fighterService.createFighter(fighter);
-    }
-
-    @DeleteMapping("/{id}")
-    public  FighterDTO deleteFighter(@PathVariable Long id) {
-        return fighterService.deleteFighter(id);
     }
 
     @PutMapping("/{id}")
@@ -33,20 +28,31 @@ public class FightersController {
         return fighterService.updateFighter(id, fighter);
     }
 
-    // POST /fighters/{id}/achievements -> добавить достижение
-    @PostMapping("/{id}/achievements")
-    public AchievementDTO addAchievement(@PathVariable Long id, @RequestBody AchievementDTO request) {
-        return fighterService.addAchievement(id, request.getTitle());
+    @DeleteMapping("/{id}")
+    public FighterDTO deleteFighter(@PathVariable Long id) {
+        return fighterService.deleteFighter(id);
     }
 
-    // GET /fighters/{id} -> получить бойца с ачивками
+    @DeleteMapping("/{fighterId}/achievements/{achievementId}")
+    public AchievementDTO deleteAchievement(
+            @PathVariable Long fighterId,
+            @PathVariable Long achievementId) {
+
+        return fighterService.deleteAchievement(fighterId, achievementId);
+    }
+
+    @PostMapping("/{id}/achievements")
+    public AchievementDTO addAchievement(@PathVariable Long id, @RequestBody AchievementDTO dto) {
+        return fighterService.addAchievement(id, dto.getTitle());
+    }
+
     @GetMapping("/{id}")
     public FighterDTO getFighter(@PathVariable Long id) {
         return fighterService.getFighter(id);
     }
 
-    @GetMapping()
-    public  List<FighterDTO> getAllFighters(){
+    @GetMapping
+    public List<FighterDTO> getAllFighters() {
         return fighterService.getAllFighters();
     }
 }
