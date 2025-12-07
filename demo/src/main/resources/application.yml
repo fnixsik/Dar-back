@@ -4,3 +4,9 @@ server:
 jwt:
   secret: "g9Wm1y3vC3tqzWzF3x5U2qG1J7o0Q8bZz2l8rF1o9vE="
   expiration-ms: 3600000 # 1 час
+
+minio:
+  url: https://s3.dar-team.kz
+  access-key: minioDar
+  secret-key: minioDar
+
