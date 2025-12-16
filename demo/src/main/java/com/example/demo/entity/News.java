@@ -11,7 +11,10 @@ public class News {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
+
     private String img;
     private LocalDate date;
 
