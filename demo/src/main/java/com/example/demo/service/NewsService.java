@@ -7,6 +7,7 @@ import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.NewsRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class NewsService {
 
     // Получить все новости
     public List<News> getAllNews(){
-        return newsRepository.findAll();
+        return newsRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
 
     // Создать новость
