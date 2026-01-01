@@ -6,21 +6,23 @@ import com.example.demo.entity.fighter.Achievement;
 import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
+import com.example.demo.service.MinioService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class FightersService {
 
     private final FightersRepository fighterRepository;
     private final AchievementRepository achievementRepository;
+    private final MinioService minioService;
 
     public FightersService(FightersRepository fighterRepository,
-                           AchievementRepository achievementRepository) {
+                           AchievementRepository achievementRepository, MinioService minioService) {
         this.fighterRepository = fighterRepository;
         this.achievementRepository = achievementRepository;
+        this.minioService = minioService;
     }
 
     // CREATE
@@ -74,8 +76,27 @@ public class FightersService {
         Fighters fighter = fighterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Fighter not found"));
 
+        // 1. Удаляем картинку из MinIO
+        minioService.deleteFileByUrl(fighter.getImg());
+
         fighterRepository.delete(fighter);
         return mapToDTO(fighter);
+    }
+
+    public FighterDTO deleteFighterImage(Long id) {
+        Fighters fighter = fighterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fighter not found"));
+
+        // 1. Физически удаляем файл из хранилища
+        if (fighter.getImg() != null && !fighter.getImg().isEmpty()) {
+            minioService.deleteFileByUrl(fighter.getImg());
+        }
+
+        // 2. Обнуляем ссылку в БД
+        fighter.setImg(null);
+        Fighters saved = fighterRepository.save(fighter);
+
+        return mapToDTO(saved);
     }
 
     public AchievementDTO deleteAchievement(Long fighterId, Long achievementId) {

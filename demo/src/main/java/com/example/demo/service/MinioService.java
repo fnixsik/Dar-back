@@ -1,9 +1,6 @@
 package com.example.demo.service;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,6 +49,32 @@ public class MinioService {
         }
 
         return "https://s3.dar-team.kz/" + bucketName + "/" + objectName;
+    }
+
+    public void deleteFileByUrl(String url) {
+        if (url == null || url.isEmpty()) return;
+
+        try {
+            // Находим, где заканчивается бакет в ссылке
+            // Ссылка: https://s3.dar-team.kz/dar-bucket/fighter/uuid-name.jpg
+            String prefix = "/" + bucketName + "/";
+            int index = url.indexOf(prefix);
+
+            if (index != -1) {
+                // Извлекаем: fighter/uuid-name.jpg
+                String objectName = url.substring(index + prefix.length());
+
+                minioClient.removeObject(
+                        RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(objectName)
+                                .build()
+                );
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось удалить файл из MinIO: " + url, e);
+            // Не кидаем RuntimeException, чтобы удаление сущности из БД не прервалось
+        }
     }
 }
 

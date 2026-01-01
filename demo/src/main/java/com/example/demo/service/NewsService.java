@@ -18,6 +18,11 @@ public class NewsService {
 
     @Autowired
     private NewsRepository newsRepository;
+    private final MinioService minioService;
+
+    public NewsService(MinioService minioService) {
+        this.minioService = minioService;
+    }
 
     // Получить все новости
     public List<News> getAllNews(){
@@ -44,9 +49,28 @@ public class NewsService {
         News news =  newsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("News not found"));
 
+        // 1. Удаляем картинку из MinIO
+        minioService.deleteFileByUrl(news.getImg());
+
         newsRepository.delete(news);
 
         return  mapToDTO(news);
+    }
+
+    public NewsDTO deleteNewsImage(Long id) {
+        News news = newsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+
+        // 1. Физически удаляем файл из хранилища
+        if (news.getImg() != null && !news.getImg().isEmpty()) {
+            minioService.deleteFileByUrl(news.getImg());
+        }
+
+        // 2. Обнуляем ссылку в БД
+        news.setImg(null);
+        News saved = newsRepository.save(news);
+
+        return mapToDTO(saved);
     }
 
     public NewsDTO getnews(Long id) {

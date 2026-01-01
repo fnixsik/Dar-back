@@ -2,28 +2,27 @@ package com.example.demo.service;
 
 import com.example.demo.dto.coache.CoacheDTO;
 import com.example.demo.dto.coache.MeritDTO;
+import com.example.demo.dto.fighter.FighterDTO;
 import com.example.demo.entity.coach.Coache;
 import com.example.demo.entity.coach.Merit;
 import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.coache.CoacheRepository;
 import com.example.demo.repository.coache.MeritRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class CoacheService {
 
     private final CoacheRepository coacheRepository;
     private final MeritRepository meritRepository;
+    private final MinioService minioService;
 
-    public CoacheService(CoacheRepository coacheRepository, MeritRepository meritRepository) {
+    public CoacheService(CoacheRepository coacheRepository, MeritRepository meritRepository, MinioService minioService) {
         this.coacheRepository = coacheRepository;
         this.meritRepository = meritRepository;
+        this.minioService = minioService;
     }
 
     public CoacheDTO createCoache(Coache coache) {
@@ -62,8 +61,28 @@ public class CoacheService {
     public CoacheDTO deleteCoache(Long id) {
         Coache c = coacheRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Coache not found"));
+
+        // 1. Удаляем картинку из MinIO
+        minioService.deleteFileByUrl(c.getImg());
+
         coacheRepository.delete(c);
         return mapToDTO(c);
+    }
+
+    public CoacheDTO deleteCoacheImage(Long id) {
+        Coache c = coacheRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coache not found"));
+
+        // 1. Физически удаляем файл из хранилища
+        if (c.getImg() != null && !c.getImg().isEmpty()) {
+            minioService.deleteFileByUrl(c.getImg());
+        }
+
+        // 2. Обнуляем ссылку в БД
+        c.setImg(null);
+        Coache saved = coacheRepository.save(c);
+
+        return mapToDTO(saved);
     }
 
     public MeritDTO addMerit(Long coacheId, String list) {

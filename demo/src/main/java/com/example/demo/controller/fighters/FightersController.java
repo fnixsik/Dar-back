@@ -41,6 +41,11 @@ public class FightersController {
         return fighterService.deleteAchievement(fighterId, achievementId);
     }
 
+    @DeleteMapping("/{id}/image")
+    public FighterDTO deleteFighterImage(@PathVariable Long id) {
+        return fighterService.deleteFighterImage(id);
+    }
+
     @PostMapping("/{id}/achievements")
     public AchievementDTO addAchievement(@PathVariable Long id, @RequestBody AchievementDTO dto) {
         return fighterService.addAchievement(id, dto.getTitle());

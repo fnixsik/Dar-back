@@ -33,6 +33,11 @@ public class NewsController {
         return newsService.deleteNews(id);
     }
 
+    @DeleteMapping("/{id}/image")
+    public NewsDTO deleteNewsImage(@PathVariable Long id) {
+        return newsService.deleteNewsImage(id);
+    }
+
     @PutMapping("/{id}")
     public NewsDTO updateNews(@PathVariable Long id, @RequestBody News news) {
         return newsService.updateNews(id, news);
