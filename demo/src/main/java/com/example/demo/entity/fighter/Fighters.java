@@ -12,6 +12,10 @@ public class Fighters {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // НОВОЕ ПОЛЕ ДЛЯ СОРТИРОВКИ
+    @Column(name = "position_index")
+    private Integer positionIndex = 0;
+
     private String name;
     private String nickname;
     private String birthplace;
@@ -75,6 +79,9 @@ public class Fighters {
 
     public String getImg() { return img; }
     public void setImg(String img) { this.img = img; }
+
+    public Integer getPositionIndex() {return positionIndex;}
+    public void setPositionIndex(Integer positionIndex) {this.positionIndex = positionIndex;}
 
     public List<Achievement> getAchievements() {
         return achievements;

@@ -8,6 +8,7 @@ import com.example.demo.repository.fighters.AchievementRepository;
 import com.example.demo.repository.fighters.FightersRepository;
 import com.example.demo.service.MinioService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -141,10 +142,19 @@ public class FightersService {
     }
 
     public List<FighterDTO> getAllFighters() {
-        return fighterRepository.findAll()
+        return fighterRepository.findAllByOrderByPositionIndexAsc()
                 .stream()
                 .map(this::mapToDTO)
                 .toList();
+    }
+
+    //ДЛЯ ПЕРЕСОРТИРОВКИ
+    @Transactional // Очень важно для UPDATE запросов
+    public void updateOrder(List<Long> ids) {
+        for (int i = 0; i < ids.size(); i++) {
+            // Берем ID из списка и присваиваем ему индекс i (0, 1, 2...)
+            fighterRepository.updatePositionIndex(ids.get(i), i);
+        }
     }
 
     // ----- MAPPERS -----
@@ -153,6 +163,7 @@ public class FightersService {
         FighterDTO dto = new FighterDTO();
 
         dto.setId(fighter.getId());
+        dto.setPositionIndex(fighter.getPositionIndex());
         dto.setName(fighter.getName());
         dto.setNickname(fighter.getNickname());
         dto.setBirthplace(fighter.getBirthplace());

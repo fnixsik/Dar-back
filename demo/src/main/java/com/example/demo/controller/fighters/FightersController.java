@@ -28,6 +28,11 @@ public class FightersController {
         return fighterService.updateFighter(id, fighter);
     }
 
+    @PostMapping("/reorder")
+    public void reorderFighters(@RequestBody List<Long> ids) {
+        fighterService.updateOrder(ids);
+    }
+
     @DeleteMapping("/{id}")
     public FighterDTO deleteFighter(@PathVariable Long id) {
         return fighterService.deleteFighter(id);

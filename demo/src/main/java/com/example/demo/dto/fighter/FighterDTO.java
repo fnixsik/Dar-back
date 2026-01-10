@@ -4,6 +4,7 @@ import java.util.List;
 
 public class FighterDTO {
     private Long id;
+    private Integer positionIndex;
     private String name;
     private String nickname;
     private String birthplace;
@@ -139,6 +140,9 @@ public class FighterDTO {
     public void setImg(String img) {
         this.img = img;
     }
+
+    public Integer getPositionIndex() {return positionIndex;}
+    public void setPositionIndex(Integer positionIndex) {this.positionIndex = positionIndex;}
 
     public List<AchievementDTO> getAchievements() {
         return achievements;
