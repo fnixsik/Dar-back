@@ -12,7 +12,11 @@ import java.time.LocalDate;
 public class NewsDTO {
     private Long id;
     private String title;
+    private String titleEn;
+    private String titleKz;
     private String content;
+    private String contentEn;
+    private String contentKz;
     private String img;
     private LocalDate date;
 }
