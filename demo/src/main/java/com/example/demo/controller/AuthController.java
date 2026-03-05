@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.auth.*;
+import com.example.demo.dto.user.ForgotPasswordRequestDTO;
+import com.example.demo.dto.user.ResetPasswordRequestDTO;
 import com.example.demo.entity.roles.*;
 import com.example.demo.repository.roles.UserRepository;
 import com.example.demo.security.JwtService;
+import com.example.demo.service.users.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -22,13 +25,16 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     public AuthController(AuthenticationManager authManager, JwtService jwtService,
-                          UserRepository userRepository, PasswordEncoder passwordEncoder) {
+                          UserRepository userRepository, PasswordEncoder passwordEncoder,
+                            UserService userService) {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -68,6 +74,30 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponse(token, expiresAt, principal.getUsername(), roles));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+        }
+    }
+
+    // Шаг 1: Инициировать сброс (запросить код)
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequestDTO req) {
+        try {
+            userService.initiatePasswordReset(req.getLoginOrEmail());
+            return ResponseEntity.ok(Map.of("message", "Код подтверждения отправлен на вашу почту"));
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            // Best Practice: Не говорим, что пользователя нет, чтобы не помогать хакерам
+            return ResponseEntity.ok(Map.of("message", "Если такой пользователь существует, мы отправили код."));
+        }
+    }
+
+    // Шаг 2: Подтвердить код и установить новый пароль
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDTO req) {
+        try {
+            userService.confirmResetAndChangePassword(req.getEmail(), req.getCode(), req.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Пароль успешно изменен"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
