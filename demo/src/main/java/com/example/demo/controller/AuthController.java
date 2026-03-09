@@ -47,13 +47,13 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (req.getUsername() == null || req.getUsername().isBlank()
                 || req.getPassword() == null || req.getPassword().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error","username/password required"));
+            return ResponseEntity.badRequest().body(Map.of("error","требуется имя пользователя/пароль"));
         }
         if (userRepository.existsByUsername(req.getUsername())) {
-            return ResponseEntity.badRequest().body(Map.of("error","Username already taken"));
+            return ResponseEntity.badRequest().body(Map.of("error","Имя пользователя уже занято"));
         }
         if (userRepository.existsByEmail(req.getEmail())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email already used"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Электронная почта, которая уже использовалась"));
         }
 
         try {
