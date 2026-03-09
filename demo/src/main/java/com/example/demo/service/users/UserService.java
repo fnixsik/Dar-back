@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -76,5 +77,28 @@ public class UserService {
 
         // 5. Удаляем код из Redis
         otpService.deleteCode(email);
+    }
+
+    public void initiateUserconfirm(String email, String jsonRequest ){
+        // Генерируем уникальный ключ (UUID)
+        String token = UUID.randomUUID().toString();
+
+        otpService.saveCode(token, jsonRequest);
+
+        emailService.sendRegistrationConfirmLink(email, token);
+    }
+
+    public String completeRegistration(String token) {
+        // Ищем в Redis по ключу с префиксом
+        String jsonRequest = otpService.getCode(token);
+
+        if (jsonRequest == null) {
+            throw new RuntimeException("Ссылка устарела или неверна"); //
+        }
+
+        // Удаляем из Redis после успеха
+        otpService.deleteCode(token);
+
+        return jsonRequest;
     }
 }

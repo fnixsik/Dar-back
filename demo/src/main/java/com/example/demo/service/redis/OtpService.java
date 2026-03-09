@@ -15,7 +15,7 @@ public class OtpService {
 
     // Сохраняем код на 5 минут
     public void saveCode(String email, String code) {
-        redisTemplate.opsForValue().set(PREFIX + email, code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(PREFIX + email, code, 15, TimeUnit.MINUTES);
     }
 
     // Получаем код

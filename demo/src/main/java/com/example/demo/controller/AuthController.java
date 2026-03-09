@@ -7,6 +7,9 @@ import com.example.demo.entity.roles.*;
 import com.example.demo.repository.roles.UserRepository;
 import com.example.demo.security.JwtService;
 import com.example.demo.service.users.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -37,6 +40,9 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (req.getUsername() == null || req.getUsername().isBlank()
@@ -47,15 +53,52 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error","Username already taken"));
         }
         if (userRepository.existsByEmail(req.getEmail())) {
-            return ResponseEntity.badRequest().body(Map.of("error","Email already used"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Email already used"));
         }
-        User user = new User();
-        user.setUsername(req.getUsername());
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setEmail(req.getEmail());
-        user.setRoles(Collections.singleton(Role.ROLE_USER));
-        userRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+
+        try {
+            // Хешируем пароль сразу, чтобы не хранить его в Redis открытым
+            req.setPassword(passwordEncoder.encode(req.getPassword()));
+
+            // Превращаем объект req в JSON-строку
+            String jsonRequest = new ObjectMapper().writeValueAsString(req);
+
+            userService.initiateUserconfirm(req.getEmail(), jsonRequest);
+
+            return ResponseEntity.ok(Map.of("message", "Письмо с подтверждением отправлено на " + req.getEmail()));
+
+        }catch (JsonProcessingException ex){
+            return ResponseEntity.internalServerError().body("Error during activation");
+        }
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirm(@RequestParam String token) {
+        // Достаем строку из Redis
+        String jsonRequest = userService.completeRegistration(token);
+
+        if (jsonRequest == null) {
+            return ResponseEntity.badRequest().body("Link expired or invalid");
+        }
+
+        try {
+            // ПРЕВРАЩАЕМ JSON ОБРАТНО В ОБЪЕКТ RegisterRequest
+            RegisterRequest req = objectMapper.readValue(jsonRequest, RegisterRequest.class);
+
+            // Сохраняем в PostgreSQL
+            User user = new User();
+            user.setUsername(req.getUsername());
+            user.setPassword(req.getPassword()); // Пароль уже захеширован
+            user.setEmail(req.getEmail());
+            user.setRoles(Collections.singleton(Role.ROLE_USER));
+
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Account activated!");
+
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.internalServerError().body("Error during activation");
+        }
     }
 
     @PostMapping("/login")

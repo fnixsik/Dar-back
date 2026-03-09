@@ -20,4 +20,19 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendRegistrationConfirmLink(String toEmail, String token) {
+        // Здесь ссылка ведет на другой роут во Vue
+        String confirmLink = "https://dar-team.kz/confirm-email?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("resetalldar@gmail.com");
+        message.setTo(toEmail);
+        message.setSubject("Подтверждение регистрации — Dar");
+        message.setText("Добро пожаловать!\n\n" +
+                "Чтобы завершить регистрацию, подтвердите ваш email по ссылке:\n" + confirmLink +
+                "\n\nПосле подтверждения вы сможете войти в систему.");
+
+        mailSender.send(message);
+    }
 }
