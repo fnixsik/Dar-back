@@ -1,4 +1,4 @@
-package com.example.demo.entity.roles;
+package com.example.demo.entity.users;
 
 public enum Role {
     ROLE_PUBLIC,

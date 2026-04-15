@@ -1,6 +1,6 @@
 package com.example.demo.service.users;
 
-import com.example.demo.entity.roles.User;
+import com.example.demo.entity.users.User;
 import com.example.demo.repository.roles.UserRepository;
 import com.example.demo.service.Email.EmailService;
 import com.example.demo.service.redis.OtpService;
@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService {

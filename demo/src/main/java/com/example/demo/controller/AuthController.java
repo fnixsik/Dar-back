@@ -3,7 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.auth.*;
 import com.example.demo.dto.user.ForgotPasswordRequestDTO;
 import com.example.demo.dto.user.ResetPasswordRequestDTO;
-import com.example.demo.entity.roles.*;
+import com.example.demo.entity.users.*;
+import com.example.demo.repository.roles.UserProfileRepository;
 import com.example.demo.repository.roles.UserRepository;
 import com.example.demo.security.JwtService;
 import com.example.demo.service.users.UserService;
@@ -27,15 +28,17 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
     public AuthController(AuthenticationManager authManager, JwtService jwtService,
                           UserRepository userRepository, PasswordEncoder passwordEncoder,
-                            UserService userService) {
+                            UserService userService,  UserProfileRepository userProfileRepository) {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
     }
@@ -91,8 +94,11 @@ public class AuthController {
             user.setPassword(req.getPassword()); // Пароль уже захеширован
             user.setEmail(req.getEmail());
             user.setRoles(Collections.singleton(Role.ROLE_USER));
-
             userRepository.save(user);
+
+            UserProfile profile = new UserProfile();
+            profile.setUser(user);
+            userProfileRepository.save(profile);
 
             return ResponseEntity.ok("Account activated!");
 

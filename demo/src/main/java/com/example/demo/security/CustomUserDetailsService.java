@@ -1,6 +1,6 @@
 package com.example.demo.security;
 
-import com.example.demo.entity.roles.User;
+import com.example.demo.entity.users.User;
 import com.example.demo.repository.roles.UserRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;

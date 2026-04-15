@@ -1,6 +1,6 @@
 package com.example.demo.repository.roles;
 
-import com.example.demo.entity.roles.User;
+import com.example.demo.entity.users.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
