@@ -23,8 +23,13 @@ public class Videos {
     private  String description;
 
     @Column(name = "youtube_video_id", nullable = false, unique = true)
-    private Long youtubeVideoId;
+    private String youtubeVideoId;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt =  LocalDateTime.now();
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
