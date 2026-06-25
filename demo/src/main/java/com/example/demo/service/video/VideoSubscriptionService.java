@@ -3,8 +3,11 @@ package com.example.demo.service.video;
 import com.example.demo.dto.video.VideoSubscriptionDTO;
 import com.example.demo.entity.users.User;
 import com.example.demo.entity.video.VideoSubscription;
+import com.example.demo.entity.video.Videos;
 import com.example.demo.repository.roles.UserRepository;
+import com.example.demo.repository.video.VideoRepository;
 import com.example.demo.repository.video.VideoSubscriptionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,20 +23,31 @@ public class VideoSubscriptionService {
 
     private final VideoSubscriptionRepository videoSubscriptionRepository;
     private final UserRepository userRepository;
+    private final VideoRepository videoRepository;
 
     @Transactional
-    public VideoSubscriptionDTO create(String username, Long videoId, String videoLink) { // <- ДОБАВИТЬ СЮДА
+    public VideoSubscriptionDTO create(String username, Long videoId, String videoLink) {
+        LocalDateTime now = LocalDateTime.now();
+
+        boolean alreadyHasAccess = videoSubscriptionRepository.hasActiveAccess(username, videoId, now);
+
+        if (alreadyHasAccess) {
+            throw new IllegalStateException("У вас уже есть активная подписка на это видео!");
+        }
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
-        LocalDateTime now = LocalDateTime.now();
+        Videos video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new EntityNotFoundException("Видео не найдено"));
+
         LocalDateTime expiresAt = now.plusDays(30);
 
         // Вот теперь на строке 35 переменная videoLink станет видимой!
         VideoSubscription videoSubscription = VideoSubscription.builder()
                 .user(user)
-                .videoId(videoId)
-                .videoLink(videoLink) // Строка 35 больше не будет гореть красным
+                .video(video)
+                .videoLink(videoLink)
                 .activatedAt(now)
                 .expiresAt(expiresAt)
                 .build();
@@ -43,7 +57,7 @@ public class VideoSubscriptionService {
         return VideoSubscriptionDTO.builder()
                 .id(savedSubscription.getId())
                 .userId(savedSubscription.getUser().getId())
-                .videoId(savedSubscription.getVideoId())
+                .videoId(savedSubscription.getVideo().getId())
                 .videoLink(savedSubscription.getVideoLink())
                 .activatedAt(savedSubscription.getActivatedAt())
                 .expiresAt(savedSubscription.getExpiresAt())
@@ -54,20 +68,20 @@ public class VideoSubscriptionService {
     public List<VideoSubscriptionDTO> getActiveSubscriptions(String username) {
         LocalDateTime now = LocalDateTime.now();
 
-        // 1. Получаем список активных сущностей из базы
+        // Получаем список активных сущностей из базы
         List<VideoSubscription> subscriptions = videoSubscriptionRepository
                 .findAllActiveSubscriptions(username, now);
 
-        // 2. Превращаем этот список в список DTO
+        // Превращаем этот список в список DTO
         return subscriptions.stream()
                 .map(sub -> VideoSubscriptionDTO.builder()
                         .id(sub.getId())
                         .userId(sub.getUser().getId())
-                        .videoId(sub.getVideoId())
+                        .videoId(sub.getVideo().getId())
                         .videoLink(sub.getVideoLink())
                         .activatedAt(sub.getActivatedAt())
                         .expiresAt(sub.getExpiresAt())
-                        .build()) // isExpired высчитается автоматически в геттере DTO
+                        .build())
                 .collect(Collectors.toList());
     }
 

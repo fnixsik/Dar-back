@@ -47,7 +47,7 @@ public class VideoSubscriptionController {
         }
 
         try {
-            String username = principal.getName(); // Извлекаем имя из JWT-токена
+            String username = principal.getName();
 
             // Получаем список DTO подписок
             List<VideoSubscriptionDTO> mySubscriptions = subscriptionService.getActiveSubscriptions(username);

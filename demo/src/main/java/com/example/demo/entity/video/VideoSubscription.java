@@ -22,8 +22,9 @@ public class VideoSubscription {
     @JoinColumn(name = "user_id",  nullable = false)
     private User user;
 
-    @Column(name = "video_id", nullable = false)
-    private Long videoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "video_id", nullable = false)
+    private Videos video;
 
     @Column(name = "video_link", nullable = false)
     private String videoLink;
@@ -34,8 +35,4 @@ public class VideoSubscription {
     @Column(name = "activated_at")
     private LocalDateTime activatedAt = LocalDateTime.now();
 
-    // Метод проверки: просрочена ли подписка
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiresAt);
-    }
 }

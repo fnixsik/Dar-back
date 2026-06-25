@@ -28,6 +28,13 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
+    public List<VideoDTO> getPublicVideos() {
+        return videoRepository.findByIsPremiumFalse()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public VideoDTO createVideo(VideoDTO dto) {
         if (videoRepository.existsByYoutubeVideoId(dto.getYoutubeVideoId())) {
             throw new IllegalArgumentException("Видео с таким YouTube ID уже добавлено на сайт.");
@@ -70,6 +77,7 @@ public class VideoService {
                 .title(video.getTitle())
                 .description(video.getDescription())
                 .youtubeVideoId(video.getYoutubeVideoId())
+                .isPremium(video.isPremium())
                 .createdAt(video.getCreatedAt())
                 .build();
     }

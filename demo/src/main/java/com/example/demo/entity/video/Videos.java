@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -22,6 +24,9 @@ public class Videos {
 
     private  String description;
 
+    @Column(name = "is_premium", nullable = false, columnDefinition = "boolean default false")
+    private boolean isPremium = false;
+
     @Column(name = "youtube_video_id", nullable = false, unique = true)
     private String youtubeVideoId;
 
@@ -32,4 +37,7 @@ public class Videos {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VideoSubscription> subscriptions = new ArrayList<>();
 }

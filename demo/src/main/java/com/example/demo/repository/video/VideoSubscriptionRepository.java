@@ -14,7 +14,7 @@ public interface VideoSubscriptionRepository extends JpaRepository<VideoSubscrip
 
     @Query("SELECT COUNT(s) > 0 FROM VideoSubscription s " +
             "WHERE s.user.username = :username " +
-            "AND s.videoId = :videoId " +
+            "AND s.video.id = :videoId " +
             "AND s.expiresAt > :now")
     boolean hasActiveAccess(@Param("username") String username,
                             @Param("videoId") Long videoId,

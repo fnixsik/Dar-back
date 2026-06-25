@@ -15,4 +15,5 @@ public class VideoDTO {
     private String description;
     private String youtubeVideoId;
     private LocalDateTime createdAt;
+    private Boolean isPremium;
 }
