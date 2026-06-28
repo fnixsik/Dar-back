@@ -1,12 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.NewsDTO;
-import com.example.demo.dto.coache.CoacheDTO;
-import com.example.demo.dto.fighter.FighterDTO;
-import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.service.NewsService;
 import com.example.demo.entity.News;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +19,11 @@ public class NewsController {
     private NewsService newsService;
 
     @GetMapping
-    public List<News> getAllNews(){
-        return newsService.getAllNews();
+    public ResponseEntity<Page<News>> getAllNews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size){
+        Page<News> newsPage = newsService.getAllNews(page, size);
+        return ResponseEntity.ok(newsPage);
     }
 
     @PostMapping

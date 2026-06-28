@@ -1,12 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.NewsDTO;
-import com.example.demo.dto.fighter.FighterDTO;
 import com.example.demo.entity.News;
-import com.example.demo.entity.fighter.Fighters;
 import com.example.demo.repository.NewsRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,11 @@ public class NewsService {
     }
 
     // Получить все новости
-    public List<News> getAllNews(){
-        return newsRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
+    public Page<News> getAllNews(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"date"));
+
+        return newsRepository.findAll(pageable);
     }
 
     // Создать новость
