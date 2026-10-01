@@ -22,8 +22,6 @@ public class Videos {
     @Column(nullable = false)
     private String title;
 
-    private  String description;
-
     @Column(name = "is_premium", nullable = false, columnDefinition = "boolean default false")
     private boolean isPremium = false;
 

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 public class VideoDTO {
     private Long id;
     private String title;
-    private String description;
     private String youtubeVideoId;
     private LocalDateTime createdAt;
     private Boolean isPremium;

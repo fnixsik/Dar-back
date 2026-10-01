@@ -42,7 +42,6 @@ public class VideoService {
 
         Videos video = Videos.builder()
                 .title(dto.getTitle())
-                .description(dto.getDescription())
                 .youtubeVideoId(dto.getYoutubeVideoId())
                 .build();
 
@@ -55,7 +54,6 @@ public class VideoService {
                 .orElseThrow(() -> new EntityNotFoundException("Видео для обновления не найдено."));
 
         video.setTitle(dto.getTitle());
-        video.setDescription(dto.getDescription());
         video.setYoutubeVideoId(dto.getYoutubeVideoId());
 
         Videos updatedVideo = videoRepository.save(video);
@@ -75,7 +73,6 @@ public class VideoService {
         return VideoDTO.builder()
                 .id(video.getId())
                 .title(video.getTitle())
-                .description(video.getDescription())
                 .youtubeVideoId(video.getYoutubeVideoId())
                 .isPremium(video.isPremium())
                 .createdAt(video.getCreatedAt())
